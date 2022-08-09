@@ -2,14 +2,17 @@ const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
 const CronJob = require("cron").CronJob;
 const nodemailer = require("nodemailer");
+const { promises } = require("nodemailer/lib/xoauth2");
 
+let il = "/ankara";
+let ilce = "-cankaya";
+let semt = "-balgat"
+let mahalle = "-isci-bloklari";
 
-let il = "/ankara"
-let ilce = "/cankaya"
-let mahalle = "/isci-bloklari"
+let paginationIndex = 0;
+let totalCount = 0;
 
-const url =
-  "https://www.sahibinden.com/kiralik-daire"+il+ilce+mahalle;
+const url = "https://www.sahibinden.com/kiralik-daire" + il + ilce + semt + mahalle + "-mh";
 
 const checkPrice = async () => {
   const browser = await puppeteer.launch();
@@ -31,28 +34,46 @@ const checkPrice = async () => {
 
   $(".classifiedTitle").each((i, element) => {
     titleArray.push($(element).prop("innerText").trim());
-    linkArray.push("https://www.sahibinden.com/" + $(element).attr("href"))
+    linkArray.push("https://www.sahibinden.com/" + $(element).attr("href"));
   });
 
   for (let i = 0; i < priceArray.length; i++) {
     result[titleArray[i]] = priceArray[i];
   }
 
-  console.log(result, titleArray.length);
+  //console.log(result, titleArray.length);
 
   for (let i = 0; i < priceArray.length; i++) {
-    if (parseFloat(priceArray[i]) < 2) {
+    if (parseFloat(priceArray[i]) < 7) {
       console.log("BUY!", titleArray[i], priceArray[i]);
-      console.log(linkArray[i], "\n")
+      console.log(linkArray[i], "\n");
     }
   }
+
+
+
 };
 
 checkPrice();
 
-//checks price every 15 seconds
-// let job = new CronJob("*/15 * * * * *", () => {
-//   checkPrice();
-// });
 
-// job.start();
+// if (!$(".prevNextBut").innerHTML) {
+//   await page.click('.prevNextBut')
+//   await page.waitForNavigation({waitUntil: "networkidle0"})
+//   totalCount += priceArray.length
+//   checkPrice();
+// }
+// else
+// {
+  
+// }
+
+// if ($(".prevNextBut")) {
+//   page.goto(url+"?pagingOffset="+paginationIndex+20, {waitUntil:"load"})
+//   totalCount += priceArray.length
+//   checkPrice();
+// }
+// else
+// {
+//   console.log(totalCount + " ilan incelendi")
+// }
